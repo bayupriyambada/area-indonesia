@@ -17,10 +17,9 @@ class KepulauanController extends Controller
     public function getPostData(Request $request)
     {
         $data = [
-            'provinsi_id' => $request->input('provinsi_id'),
+            'kepulauan_id' => $request->input('kepulauan_id'),
             'nama' => $request->input('nama'),
-            'umum' => $request->input('umum'),
-            'iso' => $request->input('iso'),
+            'slug' => $request->input('slug'),
         ];
         $data = (new KepulauanRepository())->aksiGetPostData($data);
         return $data;
@@ -31,8 +30,6 @@ class KepulauanController extends Controller
         $data = [
             'cari' => $request->input('cari'),
         ];
-
-        // dd($data);
         $data = (new KepulauanRepository())->aksiGetSearch($request);
         return $data;
     }

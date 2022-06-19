@@ -26,4 +26,12 @@ class ProvinsiModel extends Model
             'kota_id'
         );
     }
+
+    public function kepulauan()
+    {
+        return $this->belongsTo(
+            'App\Models\indonesia\KepulauanModel',
+            'kepulauan_id'
+        );
+    }
 }

@@ -11,6 +11,7 @@ class ProvinsiController extends Controller
     public function getAllData()
     {
         $data = (new ProvinsiRepository())->aksiGetAll();
+        // dd($data);
         return $data;
     }
     public function getPostData(Request $request)
@@ -20,17 +21,19 @@ class ProvinsiController extends Controller
             'nama' => $request->input('nama'),
             'umum' => $request->input('umum'),
             'iso' => $request->input('iso'),
+            'slug' => $request->input('slug'),
+            'kepulauan_id' => $request->input('kepulauan_id'),
         ];
         $data = (new ProvinsiRepository())->aksiGetPostData($data);
         return $data;
     }
 
-    public function getSearchData($provinsiId)
+    public function getSearchData(Request $request)
     {
         $data = [
-            'provinsi_id' => $provinsiId,
+            'cari' => $request->input('cari'),
         ];
-        $data = (new ProvinsiRepository())->aksiGetSearch($data);
+        $data = (new ProvinsiRepository())->aksiGetSearch($request);
         return $data;
     }
 }

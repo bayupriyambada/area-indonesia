@@ -4,10 +4,9 @@ namespace App\Http\Controllers\indonesia;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\indonesia\KabupatenRepository;
-use App\Repositories\indonesia\ProvinsiRepository;
 use Illuminate\Http\Request;
 
-class KabupatenController extends Controller
+class KotaController extends Controller
 {
     public function getAllData()
     {
@@ -22,15 +21,6 @@ class KabupatenController extends Controller
             'provinsi_id' => $request->input('provinsi_id'),
         ];
         $data = (new KabupatenRepository())->aksiGetPostData($data);
-        return $data;
-    }
-
-    public function getSearchData(Request $request)
-    {
-        $data = [
-            'cari' => $request->input('cari'),
-        ];
-        $data = (new KabupatenRepository())->aksiGetSearch($request);
         return $data;
     }
 }

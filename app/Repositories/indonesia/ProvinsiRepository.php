@@ -5,81 +5,87 @@ namespace App\Repositories\indonesia;
 use Illuminate\Support\Str;
 use App\Helpers\ResponsesHelpers;
 use App\Models\indonesia\ProvinsiModel;
+use App\Models\indonesia\KepulauanModel;
 
 class ProvinsiRepository
 {
     public function aksiGetAll()
     {
-        $data = ProvinsiModel::query()->get();
-        return ResponsesHelpers::getResponseSucces(200, $data);
+        try {
+            $data = ProvinsiModel::query()
+                ->with('kepulauan')
+                ->get();
+            return ResponsesHelpers::getResponseSucces(200, $data);
+        } catch (\Exception $e) {
+            return ResponsesHelpers::getResponseError(500, $e->getMessage());
+        }
     }
 
     public function aksiGetPostData($params)
     {
-        $nama = isset($params['nama']) ? $params['nama'] : '';
+        try {
+            $nama = isset($params['nama']) ? $params['nama'] : '';
 
-        if (strlen($nama) == 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'nama tidak boleh kosong',
-            ]);
-        }
-        $umum = isset($params['umum']) ? $params['umum'] : '';
-
-        if (strlen($umum) == 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'umum provinsi tidak boleh kosong',
-            ]);
-        }
-        $iso = isset($params['iso']) ? $params['iso'] : '';
-
-        if (strlen($iso) == 0) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'iso provinsi tidak boleh kosong',
-            ]);
-        }
-
-        $provinsiId = isset($params['provinsi_id'])
-            ? $params['provinsi_id']
-            : '';
-        if (strlen($provinsiId) == 0) {
-            $data = new ProvinsiModel();
-        } else {
-            $data = ProvinsiModel::find($provinsiId);
-            if (!$data) {
+            if (strlen($nama) == 0) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Provinsi tidak ditemukan',
+                    'message' => 'nama tidak boleh kosong',
                 ]);
             }
+
+            $kepulauanId = isset($params['kepulauan_id'])
+                ? $params['kepulauan_id']
+                : '';
+
+            if (strlen($kepulauanId) == 0) {
+                return ResponsesHelpers::getResponseError(
+                    500,
+                    'Kepulauan tidak boleh kosong'
+                );
+            }
+
+            $provinsiId = isset($params['provinsi_id'])
+                ? $params['provinsi_id']
+                : '';
+            if (strlen($provinsiId) == 0) {
+                $data = new ProvinsiModel();
+            } else {
+                $data = ProvinsiModel::find($provinsiId);
+                if (!$data) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Provinsi tidak ditemukan',
+                    ]);
+                }
+            }
+            $data->nama = Str::ucfirst($nama);
+            $data->slug = Str::slug($nama);
+            $data->kepulauan_id = $kepulauanId;
+
+            $data->save();
+
+            return ResponsesHelpers::getResponseSucces(200, $data);
+        } catch (\Exception $e) {
+            return ResponsesHelpers::getResponseError(500, $e->getMessage());
         }
-
-        $data->nama = Str::upper($nama);
-        $data->umum = Str::lower($umum);
-        $data->iso = 'ID-' . Str::upper($iso);
-
-        $data->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data berhasil disimpan',
-        ]);
     }
 
     public function aksiGetSearch($params)
     {
-        $provinsiId = isset($params['provinsi_id'])
-            ? $params['provinsi_id']
-            : '';
-        $data = ProvinsiModel::query()
-            ->where('provinsi_id', 'like', '%' . $provinsiId . '%')
-            ->get();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data berhasil dengan nama ' . $data[0]->nama,
-            'provinsi' => $data,
-        ]);
+        try {
+            $data = ProvinsiModel::query();
+            $cari = isset($params['cari']) ? $params['cari'] : '';
+            if (strlen($cari) > 0) {
+                $data->where(function ($query) use ($cari) {
+                    $query->whereRaw(
+                        "lower(slug) LIKE '%" . strtolower($cari) . "%'"
+                    );
+                });
+            }
+            $data = $data->with('kepulauan')->get();
+            return ResponsesHelpers::getResponseSucces(200, $data);
+        } catch (\Exception $e) {
+            return ResponsesHelpers::getResponseError(500, $e->getMessage());
+        }
     }
 }

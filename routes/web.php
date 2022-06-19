@@ -22,7 +22,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         // kepulauan
         $router->group(['prefix' => 'kepulauan'], function () use ($router) {
             $router->get('/', 'indonesia\KepulauanController@getAllData');
-            $router->get('/', 'indonesia\KepulauanController@getSearchData');
+            $router->get('/q', 'indonesia\KepulauanController@getSearchData');
             $router->post(
                 '/simpan',
                 'indonesia\KepulauanController@getPostData'
@@ -31,21 +31,17 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         // provinsi
         $router->group(['prefix' => 'provinsi'], function () use ($router) {
             $router->get('/', 'indonesia\ProvinsiController@getAllData');
-            $router->get(
-                '/{provinsiId}/cari',
-                'indonesia\ProvinsiController@getSearchData'
-            );
+            $router->get('/q', 'indonesia\ProvinsiController@getSearchData');
             $router->post(
                 '/simpan',
                 'indonesia\ProvinsiController@getPostData'
             );
         });
+
+        // kabupaten
         $router->group(['prefix' => 'kabupaten'], function () use ($router) {
             $router->get('/', 'indonesia\KabupatenController@getAllData');
-            $router->get(
-                '/{kabupatenId}/cari',
-                'indonesia\KabupatenController@getSearchData'
-            );
+            $router->get('/q', 'indonesia\KabupatenController@getSearchData');
             $router->post(
                 '/simpan',
                 'indonesia\KabupatenController@getPostData'
@@ -53,3 +49,5 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         });
     });
 });
+
+require 'indonesia/indonesia.php';
